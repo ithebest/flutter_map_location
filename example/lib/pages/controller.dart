@@ -43,32 +43,30 @@ class _ControllerPageState extends State<ControllerPage> {
           Flexible(
             child: FlutterMap(
               mapController: _mapController,
-              options: MapOptions(
-                plugins: <MapPlugin>[
-                  LocationPlugin(),
-                ],
-              ),
-              layers: <LayerOptions>[
-                TileLayerOptions(
+              options: const MapOptions(),
+              children: [
+                TileLayer(
                   urlTemplate:
                       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: <String>['a', 'b', 'c'],
+                  subdomains: const <String>['a', 'b', 'c'],
                 ),
               ],
-              nonRotatedLayers: <LayerOptions>[
-                LocationOptions(
-                  locationButton(),
-                  controller: _locationController,
-                  onLocationUpdate: (LatLngData? ld) {
-                    print(
-                        'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
-                  },
-                  onLocationRequested: (LatLngData? ld) {
-                    if (ld == null) {
-                      return;
-                    }
-                    _mapController.move(ld.location, 16.0);
-                  },
+              nonRotatedChildren: [
+                LocationLayer(
+                  LocationOptions(
+                    locationButton(),
+                    controller: _locationController,
+                    onLocationUpdate: (LatLngData? ld) {
+                      print(
+                          'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
+                    },
+                    onLocationRequested: (LatLngData? ld) {
+                      if (ld == null) {
+                        return;
+                      }
+                      _mapController.move(ld.location, 16.0);
+                    },
+                  ),
                 ),
               ],
             ),

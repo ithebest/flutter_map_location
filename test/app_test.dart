@@ -23,20 +23,14 @@ class _TestApp extends StatelessWidget {
       home: Scaffold(
         body: Center(
           child: FlutterMap(
-            options: MapOptions(
-              plugins: <MapPlugin>[
-                LocationPlugin(),
-              ],
-            ),
-            layers: <LayerOptions>[
-              TileLayerOptions(
+            options: MapOptions(),
+            children: [
+              TileLayer(
                   urlTemplate: 'https://{s}.tile.example.org/{z}/{x}/{y}.png',
-                  subdomains: <String>['a', 'b', 'c']),
-              LocationOptions(
-                (BuildContext context,
-                    ValueNotifier<LocationServiceStatus> status,
-                    Function onPressed) {
-                  return Align(
+                  subdomains: const <String>['a', 'b', 'c']),
+              LocationLayer(
+                LocationOptions(
+                  (_, status, onPressed) => Align(
                     alignment: Alignment.bottomRight,
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
@@ -46,8 +40,8 @@ class _TestApp extends StatelessWidget {
                           ),
                           onPressed: () {}),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
             ],
           ),

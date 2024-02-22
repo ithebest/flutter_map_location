@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_compass/flutter_compass.dart' show CompassEvent;
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_location/src/location_controller.dart';
 import 'package:flutter_map_location/src/types.dart';
@@ -19,7 +19,7 @@ LocationMarkerBuilder _defaultMarkerBuilder =
   final double diameter = ld.highAccuracy() ? 60.0 : 120.0;
   return Marker(
     point: ld.location,
-    builder: (_) => LocationMarker(ld, heading),
+    child: LocationMarker(ld, heading),
     height: diameter,
     width: diameter,
     rotate: false,
@@ -27,15 +27,15 @@ LocationMarkerBuilder _defaultMarkerBuilder =
 };
 
 class LocationLayer extends StatefulWidget {
-  const LocationLayer(this.options, this.map, this.stream, {Key? key})
-      : super(key: key);
+  const LocationLayer(
+    this.options, {
+    Key? key,
+  }) : super(key: key);
 
   final LocationOptions options;
-  final MapState map;
-  final Stream<Null> stream;
 
   @override
-  _LocationLayerState createState() => _LocationLayerState();
+  State<LocationLayer> createState() => _LocationLayerState();
 }
 
 class _LocationLayerState extends State<LocationLayer>
@@ -54,7 +54,7 @@ class _LocationLayerState extends State<LocationLayer>
     super.initState();
     _controller = widget.options.controller as LocationControllerImpl? ??
         LocationController() as LocationControllerImpl;
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     if (widget.options.initiallyRequest) {
       _locationRequested = true;
       _initOnLocationUpdateSubscription();
@@ -65,7 +65,7 @@ class _LocationLayerState extends State<LocationLayer>
   void dispose() {
     _locationSub?.cancel();
     _controller.dispose();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -91,41 +91,47 @@ class _LocationLayerState extends State<LocationLayer>
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
         break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Stack(
-      children: <Widget>[
-        ValueListenableBuilder<LatLngData?>(
-            valueListenable: _location,
-            builder: (BuildContext context, LatLngData? ld, Widget? child) {
-              if (ld == null) {
-                return Container();
-              }
-              final LocationMarkerBuilder? customBuilder =
-                  widget.options.markerBuilder;
-              final Marker marker = customBuilder != null
-                  ? customBuilder(context, ld, _heading)
-                  : _defaultMarkerBuilder(context, ld, _heading);
-              return MarkerLayerWidget(
-                  options: MarkerLayerOptions(markers: <Marker>[marker]));
-            }),
-        widget.options.buttonBuilder(context, _serviceStatus, () async {
-          // Check if there is no location subscription, no location value or the location service is off.
-          if (!_controller.isSubscribed() ||
-              !await Geolocator.isLocationServiceEnabled()) {
-            _initOnLocationUpdateSubscription();
-            _locationRequested = true;
-            return;
-          }
+    return MobileLayerTransformer(
+      child: Container(
+          child: Stack(
+        children: <Widget>[
+          ValueListenableBuilder<LatLngData?>(
+              valueListenable: _location,
+              builder: (BuildContext context, LatLngData? ld, Widget? child) {
+                if (ld == null) {
+                  return Container();
+                }
+                final LocationMarkerBuilder? customBuilder =
+                    widget.options.markerBuilder;
+                final Marker marker = customBuilder != null
+                    ? customBuilder(context, ld, _heading)
+                    : _defaultMarkerBuilder(context, ld, _heading);
+                return MarkerLayer(
+                  markers: <Marker>[marker],
+                );
+              }),
+          widget.options.buttonBuilder(context, _serviceStatus, () async {
+            // Check if there is no location subscription, no location value or the location service is off.
+            if (!_controller.isSubscribed() ||
+                !await Geolocator.isLocationServiceEnabled()) {
+              _initOnLocationUpdateSubscription();
+              _locationRequested = true;
+              return;
+            }
 
-          widget.options.onLocationRequested?.call(_location.value);
-        })
-      ],
-    ));
+            widget.options.onLocationRequested?.call(_location.value);
+          })
+        ],
+      )),
+    );
   }
 
   // ignore: avoid_void_async
@@ -138,8 +144,7 @@ class _LocationLayerState extends State<LocationLayer>
     await _locationSub?.cancel();
     await _controller.unsubscribePosition();
     _locationSub = _controller
-        .subscribePosition(
-            widget.options.updateInterval, widget.options.locationAccuracy)
+        .subscribePosition(widget.options.locationAccuracy)
         .listen((LatLngData loc) {
       _location.value = loc;
       widget.options.onLocationUpdate?.call(loc);

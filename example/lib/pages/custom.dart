@@ -24,62 +24,61 @@ class _CustomPageState extends State<CustomPage> {
         body: Center(
           child: FlutterMap(
             mapController: _mapController,
-            options: MapOptions(
-              plugins: <MapPlugin>[
-                LocationPlugin(),
-              ],
-            ),
-            layers: <LayerOptions>[
-              TileLayerOptions(
+            options: MapOptions(),
+            children: [
+              TileLayer(
                 urlTemplate:
                     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: <String>['a', 'b', 'c'],
               ),
             ],
-            nonRotatedLayers: <LayerOptions>[
-              LocationOptions(
-                locationButton(),
-                initiallyRequest: false,
-                onLocationUpdate: (LatLngData? ld) {
-                  print(
-                      'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
-                },
-                onLocationRequested: (LatLngData? ld) {
-                  if (ld == null) {
-                    return;
-                  }
-                  _mapController.move(ld.location, 16.0);
-                },
-                markerBuilder: (BuildContext context, LatLngData ld,
-                    ValueNotifier<double?> heading) {
-                  return Marker(
-                    point: ld.location,
-                    builder: (_) => Container(
-                      child: Column(
-                        children: <Widget>[
-                          Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: <Widget>[
-                              Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.pink[300]!.withOpacity(0.7)),
-                                height: 40.0,
-                                width: 40.0,
-                              ),
-                              const Icon(
-                                Icons.location_city,
-                                size: 30.0,
-                              ),
-                            ],
-                          ),
-                        ],
+            nonRotatedChildren: [
+              LocationLayer(
+                LocationOptions(
+                  locationButton(),
+                  initiallyRequest: false,
+                  onLocationUpdate: (LatLngData? ld) {
+                    print(
+                        'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
+                  },
+                  onLocationRequested: (LatLngData? ld) {
+                    if (ld == null) {
+                      return;
+                    }
+                    _mapController.move(ld.location, 16.0);
+                  },
+                  markerBuilder: (BuildContext context, LatLngData ld,
+                      ValueNotifier<double?> heading) {
+                    return Marker(
+                      point: ld.location,
+                      child: Container(
+                        child: Column(
+                          children: <Widget>[
+                            Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: <Widget>[
+                                Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          Colors.pink[300]!.withOpacity(0.7)),
+                                  height: 40.0,
+                                  width: 40.0,
+                                ),
+                                const Icon(
+                                  Icons.location_city,
+                                  size: 30.0,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    height: 60.0,
-                    width: 60.0,
-                  );
-                },
+                      height: 60.0,
+                      width: 60.0,
+                    );
+                  },
+                ),
               ),
             ],
           ),

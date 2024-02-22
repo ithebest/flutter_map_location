@@ -25,33 +25,30 @@ class _DefaultPageState extends State<DefaultPage> {
         body: Center(
           child: FlutterMap(
             mapController: mapController,
-            options: MapOptions(
-              plugins: <MapPlugin>[
-                // USAGE NOTE 2: Add the plugin
-                LocationPlugin(),
-              ],
-            ),
-            layers: <LayerOptions>[
-              TileLayerOptions(
+            options: MapOptions(),
+            children: [
+              TileLayer(
                 urlTemplate:
                     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: <String>['a', 'b', 'c'],
               ),
             ],
-            nonRotatedLayers: <LayerOptions>[
+            nonRotatedChildren: [
               // USAGE NOTE 3: Add the options for the plugin
-              LocationOptions(
-                locationButton(),
-                onLocationUpdate: (LatLngData? ld) {
-                  print(
-                      'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
-                },
-                onLocationRequested: (LatLngData? ld) {
-                  if (ld == null) {
-                    return;
-                  }
-                  mapController.move(ld.location, 16.0);
-                },
+              LocationLayer(
+                LocationOptions(
+                  locationButton(),
+                  onLocationUpdate: (LatLngData? ld) {
+                    print(
+                        'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
+                  },
+                  onLocationRequested: (LatLngData? ld) {
+                    if (ld == null) {
+                      return;
+                    }
+                    mapController.move(ld.location, 16.0);
+                  },
+                ),
               ),
             ],
           ),
