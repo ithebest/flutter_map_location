@@ -34,9 +34,6 @@ class _DefaultPageState extends State<DefaultPage> {
                     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: <String>['a', 'b', 'c'],
               ),
-            ],
-            nonRotatedChildren: [
-              // USAGE NOTE 3: Add the options for the plugin
               LocationLayer(
                 LocationOptions(
                   locationButton(),

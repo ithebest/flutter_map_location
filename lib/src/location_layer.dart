@@ -6,13 +6,8 @@ import 'package:flutter_compass/flutter_compass.dart' show CompassEvent;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_location/src/location_controller.dart';
-import 'package:flutter_map_location/src/types.dart';
 import 'package:geolocator/geolocator.dart'
     show Geolocator, LocationServiceDisabledException;
-
-import 'location_marker.dart';
-import 'location_options.dart';
-import 'types.dart';
 
 LocationMarkerBuilder _defaultMarkerBuilder =
     (BuildContext context, LatLngData ld, ValueNotifier<double?> heading) {
@@ -99,39 +94,37 @@ class _LocationLayerState extends State<LocationLayer>
 
   @override
   Widget build(BuildContext context) {
-    return MobileLayerTransformer(
-      child: Container(
-          child: Stack(
-        children: <Widget>[
-          ValueListenableBuilder<LatLngData?>(
-              valueListenable: _location,
-              builder: (BuildContext context, LatLngData? ld, Widget? child) {
-                if (ld == null) {
-                  return Container();
-                }
-                final LocationMarkerBuilder? customBuilder =
-                    widget.options.markerBuilder;
-                final Marker marker = customBuilder != null
-                    ? customBuilder(context, ld, _heading)
-                    : _defaultMarkerBuilder(context, ld, _heading);
-                return MarkerLayer(
-                  markers: <Marker>[marker],
-                );
-              }),
-          widget.options.buttonBuilder(context, _serviceStatus, () async {
-            // Check if there is no location subscription, no location value or the location service is off.
-            if (!_controller.isSubscribed() ||
-                !await Geolocator.isLocationServiceEnabled()) {
-              _initOnLocationUpdateSubscription();
-              _locationRequested = true;
-              return;
-            }
+    return Container(
+        child: Stack(
+      children: <Widget>[
+        ValueListenableBuilder<LatLngData?>(
+            valueListenable: _location,
+            builder: (BuildContext context, LatLngData? ld, Widget? child) {
+              if (ld == null) {
+                return Container();
+              }
+              final LocationMarkerBuilder? customBuilder =
+                  widget.options.markerBuilder;
+              final Marker marker = customBuilder != null
+                  ? customBuilder(context, ld, _heading)
+                  : _defaultMarkerBuilder(context, ld, _heading);
+              return MarkerLayer(
+                markers: <Marker>[marker],
+              );
+            }),
+        widget.options.buttonBuilder(context, _serviceStatus, () async {
+          // Check if there is no location subscription, no location value or the location service is off.
+          if (!_controller.isSubscribed() ||
+              !await Geolocator.isLocationServiceEnabled()) {
+            _initOnLocationUpdateSubscription();
+            _locationRequested = true;
+            return;
+          }
 
-            widget.options.onLocationRequested?.call(_location.value);
-          })
-        ],
-      )),
-    );
+          widget.options.onLocationRequested?.call(_location.value);
+        })
+      ],
+    ));
   }
 
   // ignore: avoid_void_async
