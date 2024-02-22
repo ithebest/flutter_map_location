@@ -7,8 +7,10 @@ import '../widgets/drawer.dart';
 class CustomPage extends StatefulWidget {
   static const String route = 'custom';
 
+  const CustomPage({super.key});
+
   @override
-  _CustomPageState createState() => _CustomPageState();
+  State<CustomPage> createState() => _CustomPageState();
 }
 
 class _CustomPageState extends State<CustomPage> {

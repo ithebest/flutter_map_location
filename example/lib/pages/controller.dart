@@ -9,8 +9,10 @@ import '../widgets/drawer.dart';
 class ControllerPage extends StatefulWidget {
   static const String route = 'controller';
 
+  const ControllerPage({super.key});
+
   @override
-  _ControllerPageState createState() => _ControllerPageState();
+  State<ControllerPage> createState() => _ControllerPageState();
 }
 
 class _ControllerPageState extends State<ControllerPage> {
