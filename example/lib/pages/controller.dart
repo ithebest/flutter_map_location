@@ -52,8 +52,6 @@ class _ControllerPageState extends State<ControllerPage> {
                       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                   subdomains: const <String>['a', 'b', 'c'],
                 ),
-              ],
-              nonRotatedChildren: [
                 LocationLayer(
                   LocationOptions(
                     locationButton(),
@@ -69,8 +67,10 @@ class _ControllerPageState extends State<ControllerPage> {
                       _mapController.move(ld.location, 16.0);
                     },
                   ),
-                ),
+                )
               ],
+
+
             ),
           )
         ])));
