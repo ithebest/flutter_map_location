@@ -1,8 +1,8 @@
+import 'package:example/pages/controller.dart';
+import 'package:example/pages/custom.dart';
+import 'package:example/pages/default.dart';
 import 'package:flutter/material.dart';
 
-import 'pages/controller.dart';
-import 'pages/custom.dart';
-import 'pages/default.dart';
 
 void main() => runApp(MyApp());
 

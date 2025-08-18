@@ -1,4 +1,4 @@
-# flutter_map_location_example
+# example
 
 A new Flutter project.
 
